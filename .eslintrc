@@ -1,0 +1,17 @@
+{
+	"env": {
+		"browser" : true
+	},
+	parser: "babel-eslint",
+	"plugins": [
+		"react"
+	],
+	"extends": ["eslint:recommended", "plugin:react/recommended"],
+	"rules": {
+		"indent": [ "warn", "tab" ],
+		"linebreak-style": [ "error", "unix" ],
+		"quotes": [ "warn", "single" ],
+		"semi": [ "warn", "always" ],
+		"no-unused-vars": ["warn", { "vars": "all", "args": "all" }]
+	}
+}
