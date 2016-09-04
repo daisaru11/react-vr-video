@@ -54,8 +54,7 @@ class PlayerControl extends React.Component {
 			<div className={styles.container}>
 				<div className={styles.bottombar}>
 					<PlayToggleButton {...props} />
-					<div className={styles.seek}>
-					</div>
+					<SeekBar {...props} />
 				</div>
 			</div>
 		);
@@ -78,5 +77,39 @@ const PlayToggleButton = (props) => {
 		</div>
 	);
 };
+
+class SeekBar extends React.Component {
+	constructor(props) {
+		super(props);
+
+		this.onInterval = this.onInterval.bind(this);
+	}
+
+	componentDidMount() {
+		this.intervalId = window.setInterval(this.onInterval, 200);
+	}
+
+	componentWillUnmount() {
+		window.clearInterval(this.intervalId);
+	}
+
+	onInterval() {
+		const duration = this.props.video.getDuration();
+		const current = this.props.video.getCurrentTime();
+		const rate = duration < 1 ? 0 : current / duration;
+		this.refs.gauge_fill.style.width = (rate * 100) + '%';
+	}
+
+	render() {
+		return (
+			<div className={styles.seekbar}>
+				<div className={styles.gauge}>
+					<div className={styles.gauge_fill} ref='gauge_fill'>
+					</div>
+				</div>
+			</div>
+		);
+	}
+}
 
 export default PlayerControl;

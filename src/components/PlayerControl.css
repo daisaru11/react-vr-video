@@ -40,12 +40,31 @@
 	background-image: url("../assets/pause.png");
 }
 
-.seek {
-	margin: 5px;
+.seekbar {
+	margin: 5px 5px 5px 0;
 	height: 30px;
+	padding: 0 10px;
 	background-color: rgba(0,0,0,0.75);
 	border-radius: 4px;
 
 	flex-grow: 1;
+
+	display: flex;
+	align-items: center;
+}
+
+.seekbar .gauge {
+	height: 10px;
+	flex-grow: 1;
+
+	border: solid 1px darkgray;
+}
+
+.seekbar .gauge .gauge_fill {
+ 	transition-property: width;
+	transition-duration: 0.2s;
+	width: 0;
+	height: 100%;
+	background-color: darkgray;
 }
 

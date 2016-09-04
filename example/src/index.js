@@ -8,7 +8,7 @@ class Main extends React.Component {
 		return (
 				<div>
 					<h1>Example</h1>
-					<div style={{width:'400px', height:'300px'}}>
+					<div style={{width:'600px', height:'400px'}}>
 						<VrVideo src='../sample-01.mp4' />
 					</div>
 				</div>
