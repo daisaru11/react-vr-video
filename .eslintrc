@@ -12,6 +12,7 @@
 		"linebreak-style": [ "error", "unix" ],
 		"quotes": [ "warn", "single" ],
 		"semi": [ "warn", "always" ],
-		"no-unused-vars": ["warn", { "vars": "all", "args": "all" }]
+		"no-unused-vars": ["warn", { "vars": "all", "args": "all" }],
+		"react/prop-types": "off"
 	}
 }

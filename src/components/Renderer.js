@@ -7,15 +7,11 @@ import {BaseVideo} from '../libs/Video';
 class Renderer extends React.Component {
 	constructor(props) {
 		super(props);
-
-		this.onContainerResize = this.onContainerResize.bind(this);
 	}
 
 	componentDidMount() {
 		this.createRenderer();
 		this.startAnimationLoop();
-
-		this.refs.container.addEventListener('resize', this.onContainerResize, false);
 	}
 
 	componentWillUnmount() {
@@ -126,10 +122,6 @@ class Renderer extends React.Component {
 		}
 
 		this.animationFrameId = requestAnimationFrame(this.updateAnimationLoop.bind(this));
-	}
-
-	onContainerResize() {
-		this.updateRendererSize();
 	}
 
 	render() {

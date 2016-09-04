@@ -41,6 +41,10 @@ module.exports = {
 				loader: 'babel'
 			},
 			{
+				test: /\.png$/,
+				loader: "file?name=build/[path][name].[ext]"
+			},
+			{
 				test:   /\.css$/,
 				loader: ExtractTextPlugin.extract('style', [
 					"css?modules&sourceMap&localIdentName=[name]-[local]-[hash:base64:6]",

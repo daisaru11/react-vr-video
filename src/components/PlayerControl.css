@@ -1,0 +1,51 @@
+
+.container {
+	position: absolute;
+
+	width: 100%;
+	height: 100%;
+}
+
+
+.bottombar {
+	position: absolute;
+	bottom: 0;
+	width: 100%;
+	height: 40px;
+
+	display: flex;
+	align-items: center;
+}
+
+.play_toggle {
+	margin: 5px;
+	width: 60px;
+	height: 30px;
+	background-color: rgba(0,0,0,0.75);
+	border-radius: 4px;
+}
+
+.play_toggle .icon {
+	width: 100%;
+	height: 100%;
+	background-size: auto 20px;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.play_toggle .icon_play {
+	background-image: url("../assets/play.png");
+}
+.play_toggle .icon_pause {
+	background-image: url("../assets/pause.png");
+}
+
+.seek {
+	margin: 5px;
+	height: 30px;
+	background-color: rgba(0,0,0,0.75);
+	border-radius: 4px;
+
+	flex-grow: 1;
+}
+

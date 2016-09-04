@@ -2,6 +2,7 @@ import React from 'react';
 import styles from './VrVideo.css';
 
 import Renderer from './Renderer';
+import PlayerControl from './PlayerControl';
 import {factory} from '../libs/Video';
 
 class VrVideo extends React.Component {
@@ -18,6 +19,7 @@ class VrVideo extends React.Component {
 		return (
 			<div className={styles.container}>
 				<Renderer video={this.video} />
+				<PlayerControl video={this.video} />
 			</div>
 		);
 	}
