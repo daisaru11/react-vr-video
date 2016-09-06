@@ -71,8 +71,16 @@ const PlayToggleButton = (props) => {
 		sIcon = styles.icon_pause;
 	}
 
+	const onClick = () => {
+		if (props.video.isPaused()) {
+			props.video.play();
+		} else {
+			props.video.pause();
+		}
+	};
+
 	return (
-		<div className={styles.play_toggle}>
+		<div className={styles.play_toggle} onClick={onClick} >
 			<div className={styles.icon +' '+ sIcon} />
 		</div>
 	);
