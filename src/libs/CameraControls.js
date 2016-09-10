@@ -27,6 +27,39 @@ export class CameraControls {
 			const pose = this.controls[i].getPose();
 			this.pose.multiply(pose);
 		}
+
+		this.adjust();
+	}
+
+	adjust() {
+		const angleV = Math.atan2(2 * (this.pose.w * this.pose.x - this.pose.y * this.pose.z),  1 - 2 * (this.pose.x*this.pose.x + this.pose.z*this.pose.z));
+
+		let over = 0;
+		let needsAdjust = false;
+		if ( angleV > (+ Math.PI * 0.5) ) {
+			over = angleV - Math.PI * 0.5;
+			needsAdjust = true;
+		}
+		if ( angleV < (- Math.PI * 0.5) ) {
+			over = angleV - Math.PI * 0.5;
+			needsAdjust = true;
+		}
+		if (needsAdjust) {
+			for (let i=0; i<this.controls.length; ++i) {
+
+				// find a control which is able to adjust the angle offset.
+				if (this.controls[i].adjustFeedback && this.controls[i].adjustFeedback(over) ) {
+
+					const axisV = this.__update_axisV ? this.__update_axisV : new THREE.Vector3(1, 0, 0); // cache
+					const qV = this.__update_qV ? this.__update_qV : new THREE.Quaternion(); // cache
+					qV.setFromAxisAngle(axisV, -over);
+
+					this.pose.multiply(qV);
+					break;
+				}
+			}
+		}
+
 	}
 
 	getPose() {
@@ -60,8 +93,8 @@ export class TouchContol {
 		this.angleV = 0;
 		this.pose = new THREE.Quaternion();
 
-		this.rotVelocityH = 1.0;
-		this.rotVelocityV = 1.0;
+		this.rotVelocityH = 0.5;
+		this.rotVelocityV = 0.5;
 
 		this.state = TouchContol.State.None;
 		this.movingEventCount = 0;
@@ -155,6 +188,11 @@ export class TouchContol {
 
 			this.rotUpdated = false;
 		}
+	}
+
+	adjustFeedback(angleV) {
+		this.angleV -= angleV;
+		return true;
 	}
 
 	getPose() {
