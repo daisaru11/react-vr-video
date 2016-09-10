@@ -3,6 +3,7 @@ import THREE from 'three';
 import styles from './Renderer.css';
 
 import {BaseVideo} from '../libs/Video';
+import {TouchContol} from '../libs/CameraControls';
 
 class Renderer extends React.Component {
 	constructor(props) {
@@ -116,12 +117,22 @@ class Renderer extends React.Component {
 				this.three.videoTexture.needsUpdate = true;
 			}
 
+			this.three.camera.setRotationFromQuaternion( this.props.cameraControls.getPose() );
+
 			const size = this.getContainerSize();
 			this.three.renderer.setViewport( 0, 0, size.width, size.height );
 			this.three.renderer.render( this.three.scene, this.three.camera );
 		}
 
 		this.animationFrameId = requestAnimationFrame(this.updateAnimationLoop.bind(this));
+	}
+
+	getTouchControl() {
+		if (!this.refs.rendererCanvas) {
+			return null;
+		}
+
+		return new TouchContol(this.refs.rendererCanvas);
 	}
 
 	render() {
