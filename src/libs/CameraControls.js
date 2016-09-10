@@ -148,6 +148,12 @@ export class TouchContol {
 			return;
 		}
 
+		if (event.buttons == 0) {
+			// mouse-leave -> mouse-up -> mouse-enter
+			this.setState(TouchContol.State.None);
+			return;
+		}
+
 		this.rotCurrent.set(event.screenX, event.screenY);
 
 		if (this.movingEventCount > 0) { // skip first event
