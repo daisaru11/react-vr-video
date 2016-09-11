@@ -3,6 +3,7 @@ import React from 'react';
 import styles from './PlayerControl.css';
 
 import {BaseVideo} from '../libs/Video';
+import {timetext} from '../libs/util';
 
 const PlayerState = {
 	None: 0,
@@ -53,8 +54,11 @@ class PlayerControl extends React.Component {
 		return (
 			<div className={styles.container}>
 				<div className={styles.bottombar}>
-					<PlayToggleButton {...props} />
 					<SeekBar {...props} />
+					<div className={styles.controls} >
+						<PlayToggleButton {...props} />
+						<TimeInfo {...props} />
+					</div>
 				</div>
 			</div>
 		);
@@ -86,6 +90,41 @@ const PlayToggleButton = (props) => {
 	);
 };
 
+class TimeInfo extends React.Component {
+	constructor(props) {
+		super(props);
+
+		this.onInterval = this.onInterval.bind(this);
+	}
+
+	componentDidMount() {
+		this.intervalId = window.setInterval(this.onInterval, 200);
+	}
+
+	componentWillUnmount() {
+		window.clearInterval(this.intervalId);
+	}
+
+	onInterval() {
+		this.updateTime();
+	}
+
+	updateTime() {
+		const duration = this.props.video.getDuration();
+		const current = this.props.video.getCurrentTime();
+
+		this.refs.timeinfo.textContent = timetext(current) + ' / ' + timetext(duration);
+	}
+
+	render() {
+		// because of performance,
+		// information about playback time is refreshed by manipulating the dom directlly.
+		return (
+			<div className={styles.timeinfo} ref='timeinfo'>00:00 / 00:00</div>
+		);
+	}
+}
+
 class SeekBar extends React.Component {
 	constructor(props) {
 		super(props);
@@ -94,6 +133,13 @@ class SeekBar extends React.Component {
 		this.onWindowMouseDown = this.onWindowMouseDown.bind(this);
 		this.onWindowMouseMove = this.onWindowMouseMove.bind(this);
 		this.onWindowMouseUp = this.onWindowMouseUp.bind(this);
+		this.onGaugeMouseOver = this.onGaugeMouseOver.bind(this);
+		this.onGaugeMouseOut = this.onGaugeMouseOut.bind(this);
+
+		this.state = {
+			seeking: false,
+			hovered: false,
+		};
 	}
 
 	componentDidMount() {
@@ -102,6 +148,9 @@ class SeekBar extends React.Component {
 		window.addEventListener('mousedown', this.onWindowMouseDown, true);
 		window.addEventListener('mousemove', this.onWindowMouseMove, true);
 		window.addEventListener('mouseup', this.onWindowMouseUp, true);
+
+		this.refs.gauge.addEventListener('mouseover', this.onGaugeMouseOver, true);
+		this.refs.gauge.addEventListener('mouseout', this.onGaugeMouseOut, true);
 	}
 
 	componentWillUnmount() {
@@ -128,33 +177,52 @@ class SeekBar extends React.Component {
 		this.seekStartX = event.pageX;
 		this.seekToTime = seekToTime;
 		this.seekStartTime = seekToTime;
-		this.isSeeking = true;
+		this.hoveredTime = seekToTime;
+		this.setState({seeking:true});
 	}
 
 	onWindowMouseMove(event) {
-		if (!this.isSeeking) {
-			return;
-		}
 
 		const duration = this.props.video.getDuration();
-		const moveX = event.pageX - this.seekStartX;
 
-		let seekToTime = this.seekStartTime + duration * (moveX / this.refs.gauge.offsetWidth);
-		seekToTime = Math.max(seekToTime, 0);
-		seekToTime = Math.min(seekToTime, duration);
+		if (this.state.hovered) {
+			const hoveredRate = (event.offsetX / this.refs.gauge.offsetWidth);
+			let hoveredTime = duration * hoveredRate;
+			hoveredTime = Math.max(hoveredTime, 0);
+			hoveredTime = Math.min(hoveredTime, duration);
 
-		this.seekToTime = seekToTime;
+			this.hoveredTime = hoveredTime;
+		}
 
-		this.updateTime();
+		if (this.state.seeking) {
+			const moveX = event.pageX - this.seekStartX;
+
+			let seekToTime = this.seekStartTime + duration * (moveX / this.refs.gauge.offsetWidth);
+			seekToTime = Math.max(seekToTime, 0);
+			seekToTime = Math.min(seekToTime, duration);
+
+			this.seekToTime = seekToTime;
+
+		}
+
+		if (this.state.seeking || this.state.hovered) {
+			this.updateTime();
+		}
 	}
 
 	onWindowMouseUp(event) {
-		if (!this.isSeeking) {
-			return;
+		if (this.state.seeking) {
+			this.setState({seeking:false});
+			this.props.video.setCurrentTime(this.seekToTime);
 		}
+	}
 
-		this.isSeeking = false;
-		this.props.video.setCurrentTime(this.seekToTime);
+	onGaugeMouseOver(event) {
+		this.setState({hovered:true});
+	}
+
+	onGaugeMouseOut(event) {
+		this.setState({hovered:false});
 	}
 
 	onInterval() {
@@ -165,19 +233,40 @@ class SeekBar extends React.Component {
 		const duration = this.props.video.getDuration();
 
 		let current = this.props.video.getCurrentTime();
-		if (this.isSeeking) {
+		if (this.state.seeking) {
 			current = this.seekToTime;
 		}
 
 		const rate = duration < 1 ? 0 : current / duration;
 		this.refs.gauge_fill.style.width = (rate * 100) + '%';
+
+		if (this.state.seeking || this.state.hovered) {
+			let hoveredTime = this.hoveredTime;
+			if (this.state.seeking) {
+				hoveredTime = this.seekToTime;
+			}
+			const hoveredRate = duration < 1 ? 0 : hoveredTime / duration;
+			this.refs.hovertime.textContent = timetext(hoveredTime);
+			this.refs.hovertime_locator.style.left = (hoveredRate * 100) + '%';
+		}
+
 	}
 
 	render() {
+		let sHoverTime = styles.hovertime;
+		if (this.state.seeking || this.state.hovered) {
+			sHoverTime += ' ' + styles.active;
+		}
+
+		// because of performance,
+		// information about playback time is refreshed by manipulating the dom directlly.
 		return (
 			<div className={styles.seekbar}>
 				<div className={styles.gauge} ref='gauge'>
 					<div className={styles.gauge_fill} ref='gauge_fill'>
+					</div>
+					<div className={styles.hovertime_locator} ref='hovertime_locator'>
+						<div className={sHoverTime} ref="hovertime">00:00</div>
 					</div>
 				</div>
 			</div>

@@ -6,48 +6,16 @@
 	height: 100%;
 }
 
-
 .bottombar {
 	position: absolute;
 	bottom: 0;
 	width: 100%;
-	height: 40px;
 
-	display: flex;
-	align-items: center;
-}
-
-.play_toggle {
-	pointer-events: auto;
-	cursor: pointer;
-	margin: 5px;
-	width: 60px;
-	height: 30px;
-	background-color: rgba(0,0,0,0.75);
-	border-radius: 4px;
-}
-
-.play_toggle .icon {
-	width: 100%;
-	height: 100%;
-	background-size: auto 20px;
-	background-position: center center;
-	background-repeat: no-repeat;
-}
-
-.play_toggle .icon_play {
-	background-image: url("../assets/play.png");
-}
-.play_toggle .icon_pause {
-	background-image: url("../assets/pause.png");
+	background-color: rgba(0,0,0,0.5);
 }
 
 .seekbar {
-	margin: 5px 5px 5px 0;
-	height: 30px;
-	padding: 0 10px;
-	background-color: rgba(0,0,0,0.75);
-	border-radius: 4px;
+	margin: 5px 5px 0;
 
 	flex-grow: 1;
 
@@ -57,10 +25,11 @@
 
 .seekbar .gauge {
 	pointer-events: auto;
-	height: 10px;
-	flex-grow: 1;
 
-	border: solid 1px darkgray;
+	position: relative;
+	width: 100%;
+	height: 5px;
+	background-color: rgba(80, 80, 80, 0.75);
 }
 
 .seekbar .gauge .gauge_fill {
@@ -71,6 +40,62 @@
 	*/
 	width: 0;
 	height: 100%;
-	background-color: darkgray;
+	background-color: rgba(160, 160, 160, 1);
 }
 
+.seekbar .gauge .hovertime_locator {
+	position: absolute;
+	bottom: 20px;
+	left: 0;
+}
+
+.seekbar .gauge .hovertime {
+	position: relative;
+	opacity: 0;
+ 	transition-property: opacity;
+	transition-duration: 0.2s;
+	left: -50%;
+	font-size: 60%;
+	padding: 2px 4px;
+	border: solid 1px darkgray;
+	border-radius: 2px;
+	background-color: rgba(0, 0, 0, 0.75);
+}
+
+.seekbar .gauge .hovertime.active {
+	opacity: 1.0;
+}
+
+.controls {
+	display: flex;
+	align-items: center;
+	width: 100%;
+	height: 30px;
+}
+
+.controls .play_toggle {
+	pointer-events: auto;
+	cursor: pointer;
+	margin: 5px;
+	width: 30px;
+	height: 20px;
+}
+
+.controls .play_toggle .icon {
+	width: 100%;
+	height: 100%;
+	background-size: auto 15px;
+	background-position: center center;
+	background-repeat: no-repeat;
+}
+
+.controls .play_toggle .icon_play {
+	background-image: url("../assets/play.png");
+}
+.controls .play_toggle .icon_pause {
+	background-image: url("../assets/pause.png");
+}
+
+.controls .timeinfo {
+	font-size: 60%;
+}
