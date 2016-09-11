@@ -91,19 +91,84 @@ class SeekBar extends React.Component {
 		super(props);
 
 		this.onInterval = this.onInterval.bind(this);
+		this.onWindowMouseDown = this.onWindowMouseDown.bind(this);
+		this.onWindowMouseMove = this.onWindowMouseMove.bind(this);
+		this.onWindowMouseUp = this.onWindowMouseUp.bind(this);
 	}
 
 	componentDidMount() {
 		this.intervalId = window.setInterval(this.onInterval, 200);
+
+		window.addEventListener('mousedown', this.onWindowMouseDown, true);
+		window.addEventListener('mousemove', this.onWindowMouseMove, true);
+		window.addEventListener('mouseup', this.onWindowMouseUp, true);
 	}
 
 	componentWillUnmount() {
 		window.clearInterval(this.intervalId);
+
+		window.removeEventListener('mousedown', this.onWindowMouseDown);
+		window.removeEventListener('mousemove', this.onWindowMouseMove);
+		window.removeEventListener('mouseup', this.onWindowMouseUp);
+	}
+
+	onWindowMouseDown(event) {
+		if ( event.target != this.refs.gauge ) {
+			return;
+		}
+
+		event.stopPropagation();
+
+		const duration = this.props.video.getDuration();
+
+		let seekToTime = duration * (event.offsetX / this.refs.gauge.offsetWidth);
+		seekToTime = Math.max(seekToTime, 0);
+		seekToTime = Math.min(seekToTime, duration);
+
+		this.seekStartX = event.pageX;
+		this.seekToTime = seekToTime;
+		this.seekStartTime = seekToTime;
+		this.isSeeking = true;
+	}
+
+	onWindowMouseMove(event) {
+		if (!this.isSeeking) {
+			return;
+		}
+
+		const duration = this.props.video.getDuration();
+		const moveX = event.pageX - this.seekStartX;
+
+		let seekToTime = this.seekStartTime + duration * (moveX / this.refs.gauge.offsetWidth);
+		seekToTime = Math.max(seekToTime, 0);
+		seekToTime = Math.min(seekToTime, duration);
+
+		this.seekToTime = seekToTime;
+
+		this.updateTime();
+	}
+
+	onWindowMouseUp(event) {
+		if (!this.isSeeking) {
+			return;
+		}
+
+		this.isSeeking = false;
+		this.props.video.setCurrentTime(this.seekToTime);
 	}
 
 	onInterval() {
+		this.updateTime();
+	}
+
+	updateTime() {
 		const duration = this.props.video.getDuration();
-		const current = this.props.video.getCurrentTime();
+
+		let current = this.props.video.getCurrentTime();
+		if (this.isSeeking) {
+			current = this.seekToTime;
+		}
+
 		const rate = duration < 1 ? 0 : current / duration;
 		this.refs.gauge_fill.style.width = (rate * 100) + '%';
 	}
@@ -111,7 +176,7 @@ class SeekBar extends React.Component {
 	render() {
 		return (
 			<div className={styles.seekbar}>
-				<div className={styles.gauge}>
+				<div className={styles.gauge} ref='gauge'>
 					<div className={styles.gauge_fill} ref='gauge_fill'>
 					</div>
 				</div>
